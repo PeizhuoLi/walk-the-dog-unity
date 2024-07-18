@@ -21,7 +21,6 @@ namespace MatPlot
         private Color[] colors;
         private int NumTotalPoints;
         private int NumBasePoints;
-        // private int NumTotalPoints;
         [NonSerialized] private Mesh mesh;
         [NonSerialized] public Material pointMaterial;
         [NonSerialized] private Shader pointShader;
@@ -149,6 +148,28 @@ namespace MatPlot
             pointMaterial.SetFloat("_PointSize", size);
 
             Clear();
+        }
+        
+        public void OnPreCullCallBack(Camera cam)
+        {
+            Transform camTransform = cam.transform;
+            float distToCenter = (cam.farClipPlane - cam.nearClipPlane) / 2.0f;
+            Vector3 center = camTransform.position + camTransform.forward * distToCenter;
+            float extremeBound = 500.0f;
+            GetMesh().bounds = new Bounds (center, new Vector3(1f, 1f, 1f) * extremeBound);
+        }
+
+        public void InitializeGameObject(GameObject gameObject)
+        {
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null)
+                meshFilter = gameObject.AddComponent<MeshFilter>();
+            meshFilter.mesh = GetMesh();
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null)
+                meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            meshRenderer.material = pointMaterial;
+            meshRenderer.sortingOrder = 32762;
         }
     }
 }

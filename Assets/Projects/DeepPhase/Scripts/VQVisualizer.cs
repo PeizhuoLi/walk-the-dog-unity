@@ -58,16 +58,8 @@ namespace AI4Animation
             LoadVQData();
             if (UseMesh)
             {
-                Camera.onPreCull += OnPreCullCallBack;
-                var meshFilter = gameObject.GetComponent<MeshFilter>();
-                if (meshFilter == null)
-                    meshFilter = gameObject.AddComponent<MeshFilter>();
-                meshFilter.mesh = CurveVisualizer.ScatterPlot.GetMesh();
-                var meshRenderer = gameObject.GetComponent<MeshRenderer>();
-                if (meshRenderer == null)
-                    meshRenderer = gameObject.AddComponent<MeshRenderer>();
-                meshRenderer.material = CurveVisualizer.ScatterPlot.pointMaterial;
-                meshRenderer.sortingOrder = 32762;
+                Camera.onPreCull += CurveVisualizer.ScatterPlot.OnPreCullCallBack;
+                CurveVisualizer.ScatterPlot.InitializeGameObject(gameObject);
             }
         }
 
@@ -354,16 +346,6 @@ namespace AI4Animation
             }
             
             UltiDraw.End();
-        }
-
-        private void OnPreCullCallBack(Camera cam)
-        {
-            if (!UseMesh) return; 
-            Transform camTransform = cam.transform;
-            float distToCenter = (cam.farClipPlane - cam.nearClipPlane) / 2.0f;
-            Vector3 center = camTransform.position + camTransform.forward * distToCenter;
-            float extremeBound = 500.0f;
-            CurveVisualizer.ScatterPlot.GetMesh().bounds = new Bounds (center, new Vector3(1f, 1f, 1f) * extremeBound);
         }
 
         private void Update()
